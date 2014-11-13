@@ -1,6 +1,6 @@
 # pyStat Python module
 
-#Copyright 2010-2011 Ben Franske (ben@franske.com http://www.benfranske.com)
+#Copyright 2010-2014 Ben Franske (ben@franske.com http://www.benfranske.com)
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import serial
+import string
 from time import localtime, strftime, strptime
 global tstat_address
 global local_address
@@ -140,6 +141,24 @@ class thermostat:
 		elif not setfan:
 			status = self.sendBasicSet(tstat_address,local_address,self.commands['setfan'],0)
 		return
+	def setschedcontrol(self, control):
+		# Set whether the schedule should be in HOLD (false) or RUN (true) mode
+		if string.lower(control) == "run":
+			status = self.sendBasicSet(tstat_address,local_address,self.commands['schedulecontrol'],1)
+		elif string.lower(control) == "hold":
+			status = self.sendBasicSet(tstat_address,local_address,self.commands['schedulecontrol'],0)
+		return		
+        def setmode(self, mode):
+                # Set whether the system should be in off, heat, cool, or auto mode
+                if string.lower(mode) == "off":
+                        status = self.sendBasicSet(tstat_address,local_address,self.commands['setmode'],"O")
+                elif string.lower(mode) == "heat":
+                        status = self.sendBasicSet(tstat_address,local_address,self.commands['setmode'],"H")
+                elif string.lower(mode) == "cool":
+                        status = self.sendBasicSet(tstat_address,local_address,self.commands['setmode'],"C")
+                elif string.lower(mode) == "auto":
+                        status = self.sendBasicSet(tstat_address,local_address,self.commands['setmode'],"A")
+                return
 	def setclocktopc(self):
 		# Set the time, date and day of week on the thermostat to match the local system time on the computer
 		status = self.sendBasicSet(tstat_address,local_address,self.commands['settime'],strftime("%H:%M:%S",localtime()))
@@ -168,11 +187,35 @@ class thermostat:
 		        elif subdata[0] == "SPC":
 		                parsedData['setpointCooling']=subdata[1]
 		        elif subdata[0] == "M":
-		                parsedData['mode']=subdata[1]
+                                if subdata[1] == "O":
+                                        parsedData['mode']="off"
+                                elif subdata[1] == "H":
+                                        parsedData['mode']="heat"
+                                elif subdata[1] == "C":
+                                        parsedData['mode']="cool"
+                                elif subdata[1] == "A":
+                                        parsedData['mode']="auto"
+                                elif subdata[1] == "EH":
+                                        parsedData['mode']="emergency-heat"
 		        elif subdata[0] == "FM":
-		                parsedData['fanMode']=subdata[1]
+                                if subdata[1] == "1":
+                                        parsedData['fanMode']="on"
+                                elif subdata[1] == "0":
+                                        parsedData['fanMode']="auto"
 		        elif subdata[0] == "SC":
-		                parsedData['scheduleControl']=subdata[1]
+				if subdata[1] == "1":
+			                parsedData['scheduleControl']="run"
+				elif subdata[1] == "0":
+					parsedData['scheduleControl']="hold"
+		settings = self.getLine(tstat_address,local_address,self.commands['schedulecontrol'],"?")
+		data = settings.split()
+		for i in data:
+			subdata = i.split("=")
+			if subdata[0] == "SC":
+                                if subdata[1] == "1":
+                                        parsedData['scheduleControl']="run"
+                                elif subdata[1] == "0":
+                                        parsedData['scheduleControl']="hold"
 		return parsedData
 	def getperiodsched(self, day, period):
 		# Return an array with the schedule entries for a given day and period (day and period given numerically in RCS format)
@@ -192,26 +235,27 @@ class thermostat:
 				parsedData['schedTime']=strptime(pythonDOW + subdata[1][0:4],"%w%H%M")
 				parsedData['setpointHeating']=subdata[1][4:6]
 				parsedData['setpointCooling']=subdata[1][6:8]
-		parsedData['period']=period
+		parsedData['rcs_period_number']=period
+		parsedData['rcs_day_number']=day
                 return parsedData
 	def getdaysched(self, day):
 		# Return an array with the daily schedule for the given day (given numerically where Sun=1, Sat=7)
 		daysched = {}
 		for i in range(1,5):
-			daysched[i]=self.getperiodsched(day, i)
+			daysched['period'+str(i)]=self.getperiodsched(day, i)
 		return daysched
 	def getweeksched(self):
                 # Return an array with the complete weekly schedule (where Sun=1, Sat=7)
                 weeksched = {}
                 for i in range(1,8):
-                        weeksched[i]=self.getdaysched(i)
+                        weeksched['day'+str(i)]=self.getdaysched(i)
                 return weeksched
         def setperiodsched(self, schedule):
                 # Accepts an array with the entries for a given day and period in the same format as getperiodsched returns
                 # Note that schedTime is in the python struct_time format (with only hour, minute and weekday used)
 		day=int(strftime("%w",schedule['schedTime']))+1
 		time=strftime("%H%M",schedule['schedTime'])
-		status = self.sendBasicSet(tstat_address,local_address,self.commands['scheduleentry'] + str (day) + '/' + str(schedule['period']),time + schedule['setpointHeating'] + schedule['setpointCooling'])
+		status = self.sendBasicSet(tstat_address,local_address,self.commands['scheduleentry'] + str (day) + '/' + str(schedule['rcs_period_number']),time + schedule['setpointHeating'] + schedule['setpointCooling'])
                 return
 	def setdaysched(self, schedule):
 		# Accepts a multi-dimensional array with the entries for all periods of a given day in the same format as getdaysched returns
@@ -224,6 +268,6 @@ class thermostat:
                 # Accepts a multi-dimensional array with the entries for all periods of all days in the same format as getweeksched returns
                 # Note that schedTime is in the python struct_time format (with only hour, minute and weekday used)
                 daysched = {}
-                for i in range(1,5):
+                for i in range(1,8):
                         self.setdaysched(schedule[i])
                 return

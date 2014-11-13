@@ -14,6 +14,12 @@ def main():
 	parser.add_option("-f", "--fan",
 		action="store", type="string", dest="fan",
 		metavar="STATUS", help="Set fan STATUS to auto or on")
+        parser.add_option("-s", "--schedule-control",
+                action="store", type="string", dest="control",
+                metavar="CONTROL", help="Set system schedule CONTROL to run or hold")
+        parser.add_option("-m", "--mode",
+                action="store", type="string", dest="mode",
+                metavar="MODE", help="Set system MODE to off, heat, cool, or auto")
         parser.add_option("-c", "--clock",
                 action="store_true", dest="setclock",
                 help="Set the thermostat clock to match the PC")
@@ -26,6 +32,12 @@ def main():
 			t.setfan(0)
 		elif string.lower(options.fan) == "on":
 			t.setfan(1)
+        if options.control:
+                if string.lower(options.control) == "hold" or string.lower(options.control) == "run":
+                        t.setschedcontrol(string.lower(options.control))
+        if options.mode:
+                if string.lower(options.mode) == "off" or string.lower(options.mode) == "heat" or string.lower(options.mode) == "cool" or string.lower(options.mode) == "auto":
+                        t.setmode(string.lower(options.mode))
 	if options.setclock:
 		t.setclocktopc()
 	t.close()

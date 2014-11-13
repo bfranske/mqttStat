@@ -4,6 +4,7 @@ import pystat
 import sys
 import string
 from optparse import OptionParser
+import os
 
 def main():
 	usage = "usage: %prog [options]"
@@ -29,6 +30,7 @@ def main():
 		print ("Set Point: " + info['setpoint'])
 		print ("Mode: " + info['mode'])
 		print ("Fan Mode: " + info['fanMode'])
+		print ("Schedule Mode: "+ info['scheduleControl'])
 	t.close()
 
 if __name__ == "__main__":
