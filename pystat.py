@@ -224,6 +224,7 @@ class thermostat:
 		settings = self.getLine(tstat_address,local_address,self.commands['scheduleentry'] + str(day) + '/' + str(period),'?')
                 data = settings.split()
                 parsedData = {}
+		parsedData['day'+str(day)+'_period'+str(period)] = {}
 		pythonDOW = str(day-1)
 		for i in data:
 			subdata = i.split("=")
@@ -232,42 +233,29 @@ class thermostat:
 		#	elif subdata[0] == "O":
 		#		parsedData['originator']=subdata[1]
 			if subdata[0] == self.commands['scheduleentry'] + str(day) + '/' + str(period):
-				parsedData['schedTime']=strptime(pythonDOW + subdata[1][0:4],"%w%H%M")
-				parsedData['setpointHeating']=subdata[1][4:6]
-				parsedData['setpointCooling']=subdata[1][6:8]
-		parsedData['rcs_period_number']=period
-		parsedData['rcs_day_number']=day
+				parsedData['day'+str(day)+'_period'+str(period)]['schedTime']=strptime(pythonDOW + subdata[1][0:4],"%w%H%M")
+				parsedData['day'+str(day)+'_period'+str(period)]['setpointHeating']=int(subdata[1][4:6])
+				parsedData['day'+str(day)+'_period'+str(period)]['setpointCooling']=int(subdata[1][6:8])
+		parsedData['day'+str(day)+'_period'+str(period)]['rcs_period_number']=int(period)
+		parsedData['day'+str(day)+'_period'+str(period)]['rcs_day_number']=int(day)
                 return parsedData
 	def getdaysched(self, day):
-		# Return an array with the daily schedule for the given day (given numerically where Sun=1, Sat=7)
+		# Return an array with all four periods in the given day (given numerically where Sun=1, Sat=7)
 		daysched = {}
 		for i in range(1,5):
-			daysched['period'+str(i)]=self.getperiodsched(day, i)
+			daysched.update(self.getperiodsched(day, i))
 		return daysched
 	def getweeksched(self):
                 # Return an array with the complete weekly schedule (where Sun=1, Sat=7)
                 weeksched = {}
                 for i in range(1,8):
-                        weeksched['day'+str(i)]=self.getdaysched(i)
+                        weeksched.update(self.getdaysched(i))
                 return weeksched
-        def setperiodsched(self, schedule):
-                # Accepts an array with the entries for a given day and period in the same format as getperiodsched returns
+        def setsched(self, schedule):
+                # Accepts an array with the entries for a one or more days and periods in the same format as getperiodsched returns
                 # Note that schedTime is in the python struct_time format (with only hour, minute and weekday used)
-		day=int(strftime("%w",schedule['schedTime']))+1
-		time=strftime("%H%M",schedule['schedTime'])
-		status = self.sendBasicSet(tstat_address,local_address,self.commands['scheduleentry'] + str (day) + '/' + str(schedule['rcs_period_number']),time + schedule['setpointHeating'] + schedule['setpointCooling'])
-                return
-	def setdaysched(self, schedule):
-		# Accepts a multi-dimensional array with the entries for all periods of a given day in the same format as getdaysched returns
-		# Note that schedTime is in the python struct_time format (with only hour, minute and weekday used)
-		daysched = {}
-                for i in range(1,5):
-			self.setperiodsched(schedule[i])
-                return
-        def setweeksched(self, schedule):
-                # Accepts a multi-dimensional array with the entries for all periods of all days in the same format as getweeksched returns
-                # Note that schedTime is in the python struct_time format (with only hour, minute and weekday used)
-                daysched = {}
-                for i in range(1,8):
-                        self.setdaysched(schedule[i])
+		for period in schedule:
+			day=int(strftime("%w",schedule[period]['schedTime']))+1
+			time=strftime("%H%M",schedule[period]['schedTime'])
+			status = self.sendBasicSet(tstat_address,local_address,self.commands['scheduleentry'] + str (day) + '/' + str(schedule[period]['rcs_period_number']),time + str(schedule[period]['setpointHeating']) + str(schedule[period]['setpointCooling']))
                 return
