@@ -1,0 +1,12 @@
+[Unit]
+Description=RCS Thermostat MQTT Bridge
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/mqttStat
+Type=simple
+User=mqttstat
+ExecStart=/opt/mqttStat/bin/mqttStat
+
+[Install]
+WantedBy=multi-user.target

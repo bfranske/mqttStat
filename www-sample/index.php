@@ -4,25 +4,27 @@ if(isset($_POST['submit']))
 	if(isset($_POST['sysmode']))
         {
                 $new_sysmode = $_POST['sysmode'];
-                exec('/home/homecontrol/pyStat/setStat.py -m '.$new_sysmode, $output);
+                exec('/opt/mqttStat/bin/setStat -m '.$new_sysmode, $output);
         }
 	if(isset($_POST['setpoint']))
 	{
 		$new_setpoint = $_POST['setpoint'];
-		exec('/home/homecontrol/pyStat/setStat.py -t '.$new_setpoint, $output);
+		exec('/opt/mqttStat/bin/setStat -t '.$new_setpoint, $output);
 	}
 	if(isset($_POST['fanmode']))
 	{
 		$new_fanmode = $_POST['fanmode'];
-		exec('/home/homecontrol/pyStat/setStat.py -f '.$new_fanmode, $output);
+		exec('/opt/mqttStat/bin/setStat -f '.$new_fanmode, $output);
 	}
 	if(isset($_POST['schedmode']))
         {
                 $new_schedmode = $_POST['schedmode'];
-                exec('/home/homecontrol/pyStat/setStat.py -s '.$new_schedmode, $output);
+                exec('/opt/mqttStat/bin/setStat -s '.$new_schedmode, $output);
         }
+	//Always Update Clock
+	exec('/opt/mqttStat/bin/setStat -c', $output);
 }
-exec('/home/homecontrol/pyStat/getStat.py -b 2>&1', $output);
+exec('/opt/mqttStat/bin/getStat -b 2>&1', $output);
 preg_match('/Temperature: (?P<value>\d+)/',$output[0],$matches);
 $data['temp']=$matches['value'];
 preg_match('/Set Point: (?P<value>\d+)/',$output[1],$matches);
@@ -51,5 +53,7 @@ New Fan Mode: <input type="radio" name="fanmode" value="on"> On <input type="rad
 New Schedule Mode: <input type="radio" name="schedmode" value="run"> Run <input type="radio" name="schedmode" value="hold"> Hold<br>
 <input type="submit" name="submit" value="Submit Form"><br>
 </form>
+<p>Clock is reset every form submission.</p>
+<h1><a href=sched.html>Edit Schedule</a></h1>
 </body>
 </html>

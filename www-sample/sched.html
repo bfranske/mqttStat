@@ -1,0 +1,261 @@
+<html>
+<head>
+<title>Thermostat Schedule</title>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="jquery.serialize-object.min.js"></script>
+</head>
+<style type="text/css">
+.prog-table  {border-collapse:collapse;border-spacing:0;}
+.prog-table td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
+.prog-table th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
+.prog-table .header{font-weight:bold}
+.prog-table .day-of-week{font-weight:bold}
+.prog-table .label-cell{}
+.prog-table .field-cell{}
+</style>
+<script>
+window.onload = afterLoad;
+$.get("sched.php", {}, populateSched, "json");
+function populateSched(data) {
+	$.each(data, function(key, value) {
+		var day_number = value['rcs_day_number'];
+		var period_number = value['rcs_period_number'];
+		document.forms['schedule'].elements['day'+day_number+'_period'+period_number+'_schedTime'].value = value['schedTime'];
+		document.forms['schedule'].elements['day'+day_number+'_period'+period_number+'_setpointHeating'].value = value['setpointHeating'];
+		document.forms['schedule'].elements['day'+day_number+'_period'+period_number+'_setpointCooling'].value = value['setpointCooling'];
+	});
+}
+function afterLoad() {
+	document.getElementById('reload').onclick = function() {
+		$.get("sched.php", {}, populateSched, "json");
+	}
+	document.getElementById('download').onclick = function() {
+		document.forms['schedule'].action="sched.php";
+		document.forms['schedule'].elements['formaction'].value="download";
+		document.forms['schedule'].submit();
+	}
+	document.getElementById('send').onclick = function() {
+		document.forms['schedule'].elements['formaction'].value="send";
+		$.post("sched.php", $("form[name='schedule']").serializeObject());
+	}
+}
+</script>
+<body>
+<form name="schedule" method="post">
+<table class="prog-table" style="undefined">
+  <tr>
+    <th class="header">Day<br></th>
+    <th class="header" colspan="4">Morning</th>
+    <th class="header" colspan="4">Day</th>
+    <th class="header" colspan="4">Evening</th>
+    <th class="header" colspan="4">Night<br></th>
+  </tr>
+  <tr>
+    <td class="day-of-week" rowspan="2">Sunday:</td>
+    <td class="label-cell" rowspan="2">Time:</td>
+    <td class="field-cell" rowspan="2"><input type="text" size="4" name="day1_period1_schedTime" id="1"><br><input type="radio" name="day1_period1_12h" value="AM">AM<input type="radio" name="day1_period1_12h" value="PM">PM</td>
+    <td class="label-cell">Heat:</td>
+    <td class="field-cell"><input type="text" size="1" name="day1_period1_setpointHeating"></td>
+     <td class="label-cell" rowspan="2">Time:</td>
+    <td class="field-cell" rowspan="2"><input type="text" size="4" name="day1_period2_schedTime"><br><input type="radio" name="day1_period2_12h" value="AM">AM<input type="radio" name="day1_period2_12h" value="PM">PM</td>
+    <td class="label-cell">Heat:</td>
+    <td class="field-cell"><input type="text" size="1" name="day1_period2_setpointHeating"></td>
+    <td class="label-cell" rowspan="2">Time:</td>
+    <td class="field-cell" rowspan="2"><input type="text" size="4" name="day1_period3_schedTime"><br><input type="radio" name="day1_period3_12h" value="AM">AM<input type="radio" name="day1_period3_12h" value="PM">PM</td>
+    <td class="label-cell">Heat:</td>
+    <td class="field-cell"><input type="text" size="1" name="day1_period3_setpointHeating"></td>
+    <td class="label-cell" rowspan="2">Time:</td>
+    <td class="field-cell" rowspan="2"><input type="text" size="4" name="day1_period4_schedTime"><br><input type="radio" name="day1_period4_12h" value="AM">AM<input type="radio" name="day1_period4_12h" value="PM">PM</td>
+    <td class="label-cell">Heat:</td>
+    <td class="field-cell"><input type="text" size="1" name="day1_period4_setpointHeating"></td>
+  </tr>
+  <tr>
+    <td class="label-cell">Cool:</td>
+    <td class="field-cell"><input type="text" size="1" name="day1_period1_setpointCooling"></td>
+    <td class="label-cell">Cool:</td>
+    <td class="field-cell"><input type="text" size="1" name="day1_period2_setpointCooling"></td>
+    <td class="label-cell">Cool:</td>
+    <td class="field-cell"><input type="text" size="1" name="day1_period3_setpointCooling"></td>
+    <td class="label-cell">Cool:</td>
+    <td class="field-cell"><input type="text" size="1" name="day1_period4_setpointCooling"></td>
+  </tr>
+  <tr>
+    <td class="day-of-week" rowspan="2">Monday:</td>
+    <td class="label-cell" rowspan="2">Time:</td>
+    <td class="field-cell" rowspan="2"><input type="text" size="4" name="day2_period1_schedTime"><br><input type="radio" name="day2_period1_12h" value="AM">AM<input type="radio" name="day2_period1_12h" value="PM">PM</td>
+    <td class="label-cell">Heat:</td>
+    <td class="field-cell"><input type="text" size="1" name="day2_period1_setpointHeating"></td>
+     <td class="label-cell" rowspan="2">Time:</td>
+    <td class="field-cell" rowspan="2"><input type="text" size="4" name="day2_period2_schedTime"><br><input type="radio" name="day2_period2_12h" value="AM">AM<input type="radio" name="day2_period2_12h" value="PM">PM</td>
+    <td class="label-cell">Heat:</td>
+    <td class="field-cell"><input type="text" size="1" name="day2_period2_setpointHeating"></td>
+    <td class="label-cell" rowspan="2">Time:</td>
+    <td class="field-cell" rowspan="2"><input type="text" size="4" name="day2_period3_schedTime"><br><input type="radio" name="day2_period3_12h" value="AM">AM<input type="radio" name="day2_period3_12h" value="PM">PM</td>
+    <td class="label-cell">Heat:</td>
+    <td class="field-cell"><input type="text" size="1" name="day2_period3_setpointHeating"></td>
+    <td class="label-cell" rowspan="2">Time:</td>
+    <td class="field-cell" rowspan="2"><input type="text" size="4" name="day2_period4_schedTime"><br><input type="radio" name="day2_period4_12h" value="AM">AM<input type="radio" name="day2_period4_12h" value="PM">PM</td>
+    <td class="label-cell">Heat:</td>
+    <td class="field-cell"><input type="text" size="1" name="day2_period4_setpointHeating"></td>
+  </tr>
+  <tr>
+    <td class="label-cell">Cool:</td>
+    <td class="field-cell"><input type="text" size="1" name="day2_period1_setpointCooling"></td>
+    <td class="label-cell">Cool:</td>
+    <td class="field-cell"><input type="text" size="1" name="day2_period2_setpointCooling"></td>
+    <td class="label-cell">Cool:</td>
+    <td class="field-cell"><input type="text" size="1" name="day2_period3_setpointCooling"></td>
+    <td class="label-cell">Cool:</td>
+    <td class="field-cell"><input type="text" size="1" name="day2_period4_setpointCooling"></td>
+  </tr>
+  <tr>
+    <td class="day-of-week" rowspan="2">Tuesday:</td>
+    <td class="label-cell" rowspan="2">Time:</td>
+    <td class="field-cell" rowspan="2"><input type="text" size="4" name="day3_period1_schedTime"><br><input type="radio" name="day3_period1_12h" value="AM">AM<input type="radio" name="day3_period1_12h" value="PM">PM</td>
+    <td class="label-cell">Heat:</td>
+    <td class="field-cell"><input type="text" size="1" name="day3_period1_setpointHeating"></td>
+     <td class="label-cell" rowspan="2">Time:</td>
+    <td class="field-cell" rowspan="2"><input type="text" size="4" name="day3_period2_schedTime"><br><input type="radio" name="day3_period2_12h" value="AM">AM<input type="radio" name="day3_period2_12h" value="PM">PM</td>
+    <td class="label-cell">Heat:</td>
+    <td class="field-cell"><input type="text" size="1" name="day3_period2_setpointHeating"></td>
+    <td class="label-cell" rowspan="2">Time:</td>
+    <td class="field-cell" rowspan="2"><input type="text" size="4" name="day3_period3_schedTime"><br><input type="radio" name="day3_period3_12h" value="AM">AM<input type="radio" name="day3_period3_12h" value="PM">PM</td>
+    <td class="label-cell">Heat:</td>
+    <td class="field-cell"><input type="text" size="1" name="day3_period3_setpointHeating"></td>
+    <td class="label-cell" rowspan="2">Time:</td>
+    <td class="field-cell" rowspan="2"><input type="text" size="4" name="day3_period4_schedTime"><br><input type="radio" name="day3_period4_12h" value="AM">AM<input type="radio" name="day3_period4_12h" value="PM">PM</td>
+    <td class="label-cell">Heat:</td>
+    <td class="field-cell"><input type="text" size="1" name="day3_period4_setpointHeating"></td>
+  </tr>
+  <tr>
+    <td class="label-cell">Cool:</td>
+    <td class="field-cell"><input type="text" size="1" name="day3_period1_setpointCooling"></td>
+    <td class="label-cell">Cool:</td>
+    <td class="field-cell"><input type="text" size="1" name="day3_period2_setpointCooling"></td>
+    <td class="label-cell">Cool:</td>
+    <td class="field-cell"><input type="text" size="1" name="day3_period3_setpointCooling"></td>
+    <td class="label-cell">Cool:</td>
+    <td class="field-cell"><input type="text" size="1" name="day3_period4_setpointCooling"></td>
+  </tr>
+  <tr>
+    <td class="day-of-week" rowspan="2">Wednesday:</td>
+    <td class="label-cell" rowspan="2">Time:</td>
+    <td class="field-cell" rowspan="2"><input type="text" size="4" name="day4_period1_schedTime"><br><input type="radio" name="day4_period1_12h" value="AM">AM<input type="radio" name="day4_period1_12h" value="PM">PM</td>
+    <td class="label-cell">Heat:</td>
+    <td class="field-cell"><input type="text" size="1" name="day4_period1_setpointHeating"></td>
+     <td class="label-cell" rowspan="2">Time:</td>
+    <td class="field-cell" rowspan="2"><input type="text" size="4" name="day4_period2_schedTime"><br><input type="radio" name="day4_period2_12h" value="AM">AM<input type="radio" name="day4_period2_12h" value="PM">PM</td>
+    <td class="label-cell">Heat:</td>
+    <td class="field-cell"><input type="text" size="1" name="day4_period2_setpointHeating"></td>
+    <td class="label-cell" rowspan="2">Time:</td>
+    <td class="field-cell" rowspan="2"><input type="text" size="4" name="day4_period3_schedTime"><br><input type="radio" name="day4_period3_12h" value="AM">AM<input type="radio" name="day4_period3_12h" value="PM">PM</td>
+    <td class="label-cell">Heat:</td>
+    <td class="field-cell"><input type="text" size="1" name="day4_period3_setpointHeating"></td>
+    <td class="label-cell" rowspan="2">Time:</td>
+    <td class="field-cell" rowspan="2"><input type="text" size="4" name="day4_period4_schedTime"><br><input type="radio" name="day4_period4_12h" value="AM">AM<input type="radio" name="day4_period4_12h" value="PM">PM</td>
+    <td class="label-cell">Heat:</td>
+    <td class="field-cell"><input type="text" size="1" name="day4_period4_setpointHeating"></td>
+  </tr>
+  <tr>
+    <td class="label-cell">Cool:</td>
+    <td class="field-cell"><input type="text" size="1" name="day4_period1_setpointCooling"></td>
+    <td class="label-cell">Cool:</td>
+    <td class="field-cell"><input type="text" size="1" name="day4_period2_setpointCooling"></td>
+    <td class="label-cell">Cool:</td>
+    <td class="field-cell"><input type="text" size="1" name="day4_period3_setpointCooling"></td>
+    <td class="label-cell">Cool:</td>
+    <td class="field-cell"><input type="text" size="1" name="day4_period4_setpointCooling"></td>
+  </tr>
+  <tr>
+    <td class="day-of-week" rowspan="2">Thursday:</td>
+    <td class="label-cell" rowspan="2">Time:</td>
+    <td class="field-cell" rowspan="2"><input type="text" size="4" name="day5_period1_schedTime"><br><input type="radio" name="day5_period1_12h" value="AM">AM<input type="radio" name="day5_period1_12h" value="PM">PM</td>
+    <td class="label-cell">Heat:</td>
+    <td class="field-cell"><input type="text" size="1" name="day5_period1_setpointHeating"></td>
+     <td class="label-cell" rowspan="2">Time:</td>
+    <td class="field-cell" rowspan="2"><input type="text" size="4" name="day5_period2_schedTime"><br><input type="radio" name="day5_period2_12h" value="AM">AM<input type="radio" name="day5_period2_12h" value="PM">PM</td>
+    <td class="label-cell">Heat:</td>
+    <td class="field-cell"><input type="text" size="1" name="day5_period2_setpointHeating"></td>
+    <td class="label-cell" rowspan="2">Time:</td>
+    <td class="field-cell" rowspan="2"><input type="text" size="4" name="day5_period3_schedTime"><br><input type="radio" name="day5_period3_12h" value="AM">AM<input type="radio" name="day5_period3_12h" value="PM">PM</td>
+    <td class="label-cell">Heat:</td>
+    <td class="field-cell"><input type="text" size="1" name="day5_period3_setpointHeating"></td>
+    <td class="label-cell" rowspan="2">Time:</td>
+    <td class="field-cell" rowspan="2"><input type="text" size="4" name="day5_period4_schedTime"><br><input type="radio" name="day5_period4_12h" value="AM">AM<input type="radio" name="day5_period4_12h" value="PM">PM</td>
+    <td class="label-cell">Heat:</td>
+    <td class="field-cell"><input type="text" size="1" name="day5_period4_setpointHeating"></td>
+  </tr>
+  <tr>
+    <td class="label-cell">Cool:</td>
+    <td class="field-cell"><input type="text" size="1" name="day5_period1_setpointCooling"></td>
+    <td class="label-cell">Cool:</td>
+    <td class="field-cell"><input type="text" size="1" name="day5_period2_setpointCooling"></td>
+    <td class="label-cell">Cool:</td>
+    <td class="field-cell"><input type="text" size="1" name="day5_period3_setpointCooling"></td>
+    <td class="label-cell">Cool:</td>
+    <td class="field-cell"><input type="text" size="1" name="day5_period4_setpointCooling"></td>
+  </tr>
+  <tr>
+    <td class="day-of-week" rowspan="2">Friday:</td>
+    <td class="label-cell" rowspan="2">Time:</td>
+    <td class="field-cell" rowspan="2"><input type="text" size="4" name="day6_period1_schedTime"><br><input type="radio" name="day6_period1_12h" value="AM">AM<input type="radio" name="day6_period1_12h" value="PM">PM</td>
+    <td class="label-cell">Heat:</td>
+    <td class="field-cell"><input type="text" size="1" name="day6_period1_setpointHeating"></td>
+     <td class="label-cell" rowspan="2">Time:</td>
+    <td class="field-cell" rowspan="2"><input type="text" size="4" name="day6_period2_schedTime"><br><input type="radio" name="day6_period2_12h" value="AM">AM<input type="radio" name="day6_period2_12h" value="PM">PM</td>
+    <td class="label-cell">Heat:</td>
+    <td class="field-cell"><input type="text" size="1" name="day6_period2_setpointHeating"></td>
+    <td class="label-cell" rowspan="2">Time:</td>
+    <td class="field-cell" rowspan="2"><input type="text" size="4" name="day6_period3_schedTime"><br><input type="radio" name="day6_period3_12h" value="AM">AM<input type="radio" name="day6_period3_12h" value="PM">PM</td>
+    <td class="label-cell">Heat:</td>
+    <td class="field-cell"><input type="text" size="1" name="day6_period3_setpointHeating"></td>
+    <td class="label-cell" rowspan="2">Time:</td>
+    <td class="field-cell" rowspan="2"><input type="text" size="4" name="day6_period4_schedTime"><br><input type="radio" name="day6_period4_12h" value="AM">AM<input type="radio" name="day6_period4_12h" value="PM">PM</td>
+    <td class="label-cell">Heat:</td>
+    <td class="field-cell"><input type="text" size="1" name="day6_period4_setpointHeating"></td>
+  </tr>
+  <tr>
+    <td class="label-cell">Cool:</td>
+    <td class="field-cell"><input type="text" size="1" name="day6_period1_setpointCooling"></td>
+    <td class="label-cell">Cool:</td>
+    <td class="field-cell"><input type="text" size="1" name="day6_period2_setpointCooling"></td>
+    <td class="label-cell">Cool:</td>
+    <td class="field-cell"><input type="text" size="1" name="day6_period3_setpointCooling"></td>
+    <td class="label-cell">Cool:</td>
+    <td class="field-cell"><input type="text" size="1" name="day6_period4_setpointCooling"></td>
+  </tr>
+  <tr>
+    <td class="day-of-week" rowspan="2">Saturday:</td>
+    <td class="label-cell" rowspan="2">Time:</td>
+    <td class="field-cell" rowspan="2"><input type="text" size="4" name="day7_period1_schedTime"><br><input type="radio" name="day7_period1_12h" value="AM">AM<input type="radio" name="day7_period1_12h" value="PM">PM</td>
+    <td class="label-cell">Heat:</td>
+    <td class="field-cell"><input type="text" size="1" name="day7_period1_setpointHeating"></td>
+     <td class="label-cell" rowspan="2">Time:</td>
+    <td class="field-cell" rowspan="2"><input type="text" size="4" name="day7_period2_schedTime"><br><input type="radio" name="day7_period2_12h" value="AM">AM<input type="radio" name="day7_period2_12h" value="PM">PM</td>
+    <td class="label-cell">Heat:</td>
+    <td class="field-cell"><input type="text" size="1" name="day7_period2_setpointHeating"></td>
+    <td class="label-cell" rowspan="2">Time:</td>
+    <td class="field-cell" rowspan="2"><input type="text" size="4" name="day7_period3_schedTime"><br><input type="radio" name="day7_period3_12h" value="AM">AM<input type="radio" name="day7_period3_12h" value="PM">PM</td>
+    <td class="label-cell">Heat:</td>
+    <td class="field-cell"><input type="text" size="1" name="day7_period3_setpointHeating"></td>
+    <td class="label-cell" rowspan="2">Time:</td>
+    <td class="field-cell" rowspan="2"><input type="text" size="4" name="day7_period4_schedTime"><br><input type="radio" name="day7_period4_12h" value="AM">AM<input type="radio" name="day7_period4_12h" value="PM">PM</td>
+    <td class="label-cell">Heat:</td>
+    <td class="field-cell"><input type="text" size="1" name="day7_period4_setpointHeating"></td>
+  </tr>
+  <tr>
+    <td class="label-cell">Cool:</td>
+    <td class="field-cell"><input type="text" size="1" name="day7_period1_setpointCooling"></td>
+    <td class="label-cell">Cool:</td>
+    <td class="field-cell"><input type="text" size="1" name="day7_period2_setpointCooling"></td>
+    <td class="label-cell">Cool:</td>
+    <td class="field-cell"><input type="text" size="1" name="day7_period3_setpointCooling"></td>
+    <td class="label-cell">Cool:</td>
+    <td class="field-cell"><input type="text" size="1" name="day7_period4_setpointCooling"></td>
+  </tr>
+</table>
+<input type="hidden" name="formaction">
+<input type="button" id='send' value="Send To Thermostat"><input type="button" id='download' value="Download"><input type="button" id='reload' value="Reload From Thermostat">
+</form>
+</body>
+</html>
