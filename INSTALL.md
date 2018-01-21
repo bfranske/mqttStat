@@ -10,7 +10,7 @@ _Note: These instructions are for a Debian based Linux distribution, adapt as re
 2.  Download the latest release copy of the software source.
     ```
     cd $HOME
-    git clone https://github.com/bfranske/mqttstat.git
+    git clone https://github.com/bfranske/mqttStat.git
     ```
 3. Make changes to the mqtt server address (defaults to localhost) and serial port (defaults to /dev/tty-tstat0) as required. These settings are currently found in the setup() function of the mqttStat/mqttStat/cmd_line/mqttStat.py file.
 
@@ -75,7 +75,7 @@ _Note: These instructions are for a Debian based Linux distribution, adapt as re
 2.  Download the latest release copy of the software source.
     ```
     cd $HOME
-    git clone https://github.com/bfranske/mqttstat.git
+    git clone https://github.com/bfranske/mqttStat.git
     ```
 3. Make changes to the mqtt server address (defaults to localhost) and serial port (defaults to /dev/tty-tstat0) as required. These settings are currently found in the setup() function of the mqttStat/mqttStat/cmd_line/mqttStat.py file.
 
