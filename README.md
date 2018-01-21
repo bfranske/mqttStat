@@ -21,10 +21,10 @@ This software currently provides very basic functionality. It would probably be 
 * PHP (for web UI example)
 
 # Installation
-See the [installation instructions](INSTALLATION.md).
+See the [installation instructions](INSTALL.md).
 
 # Usage
-Once the mqttStat daemon is running correctly in the background (see the [installation instructions](INSTALLATION.md)) you can use MQTT and the command line utilities provided to interact with the thermostat.
+Once the mqttStat daemon is running correctly in the background (see the [installation instructions](INSTALL.md)) you can use MQTT and the command line utilities provided to interact with the thermostat.
 
 ## Command Line Interaction
 Command line utilities are located in /opt/mqttStat/bin/ (assuming /opt/mqttStat is the directory you installed to). The getStat and setStat commands to read and set basic settings on the thermostat. The schedule can be loaded and saved from your thermostat using the schedStat command. All command have a `-h` option to see basic command line help. Try `getStat -b` to get all basic settings from the thermostat in a human readable format.
