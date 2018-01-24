@@ -105,6 +105,9 @@ class thermostat:
 		if expectdata is 1:
 			while True:
 				char = self.ser.read(1).decode('ascii')
+				if len(char) == 0:
+					#No data was recieved back even though we were expecting some
+					break
 				line += char
 				if char == '\r':
 					break
@@ -129,7 +132,7 @@ class thermostat:
 			raise
 
 # --- Low-level/internal methods ---
-			
+
 	def close(self):
 		# Use close to release the serial port and socket interface.
 		try:
@@ -156,7 +159,7 @@ class thermostat:
 			status = self.sendBasicSet(tstat_address,local_address,self.commands['schedulecontrol'],1)
 		elif string.lower(control) == "hold":
 			status = self.sendBasicSet(tstat_address,local_address,self.commands['schedulecontrol'],0)
-		return		
+		return
 	def setmode(self, mode):
 		# Set whether the system should be in off, heat, cool, or auto mode
 		if string.lower(mode) == "off":
