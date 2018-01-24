@@ -229,7 +229,7 @@ def setup():
 	logger.debug('Connecting to MQTT Broker')
 	mqttc = mqtt.Client()
 	mqttc.on_connect = lambda client,userdata,flags,rc: logger.debug('Connected to MQTT Broker: '+mqtt.connack_string(rc))
-	mqttc.on_disconnect = lambda client,userdata,rc: logger.debug('Disconnected from MQTT Broker: '+rc)
+	mqttc.on_disconnect = lambda client,userdata,rc: logger.debug('Disconnected from MQTT Broker: '+string(rc))
 	mqttc.connect("localhost", 1883, 60)
 	# Start the MQTT thread
 	mqttc.loop_start()
