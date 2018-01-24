@@ -11,6 +11,7 @@ import paho.mqtt.client as mqtt
 import zmq
 from time import localtime, strftime
 import json
+import logging
 
 previous_normalData_raw = ''
 previous_normalData_dict = {}
@@ -21,13 +22,20 @@ blocking_functions_to_run = []
 
 # Catch a signal interrupt (eg. CTRL-C) and disconnect from the serial port
 def exit_signal(signal, frame):
+	logger.debug('Received Exit Signal')
 	global t, mqttc, context
 	# Close the tstat object serial connection
 	t.close()
+	logger.debug('Closed Thermostat Serial Interface Connection')
 	# Stop the MQTT thread
 	mqttc.loop_stop(force=False)
+	mqttc.disconnect()
+	logger.debug('Closed MQTT Connection')
 	#Close the socket interface and context
 	context.destroy()
+	logger.debug('Closed Socket Connection')
+	#End logging
+	logging.shutdown()
 	sys.exit(0)
 	return
 
@@ -208,12 +216,20 @@ def set_week_schedule(t, socket, schedule):
 
 # Main Setup
 def setup():
+	# Setup logging (at the debug level for now)
+	logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',level=logging.DEBUG)
+	global logger
+	logger = logging.getLogger('mqttStat')
 	global t
+	logger.debug('Connecting to Thermostat Serial Interface')
 	t = pystat.thermostat('/dev/tty-tstat0')
 	signal.signal(signal.SIGINT, exit_signal)
 	signal.signal(signal.SIGTERM, exit_signal)
 	global mqttc
+	logger.debug('Connecting to MQTT Broker')
 	mqttc = mqtt.Client()
+	mqttc.on_connect = lambda client,userdata,flags,rc: logger.debug('Connected to MQTT Broker: '+mqtt.connack_string(rc))
+	mqttc.on_disconnect = lambda client,userdata,rc: logger.debug('Disconnected from MQTT Broker: '+rc)
 	mqttc.connect("localhost", 1883, 60)
 	# Start the MQTT thread
 	mqttc.loop_start()
@@ -223,6 +239,7 @@ def setup():
 	global context, socket
 	context = zmq.Context()
 	socket = context.socket(zmq.REP)
+	logger.debug('Opening Socket Connection')
 	socket.bind("ipc://@/mqttStat")
 	return
 
@@ -243,6 +260,7 @@ def loop():
 	if commands_to_send:
 		# Send each waiting command
 		for cmd in commands_to_send:
+			logger.debug('Sending Set Command: %s', cmd)
 			t.send_msg(cmd,0)
 			commands_to_send.remove(cmd)
 	# Check to see if there are any blocking functions which need access to the tstat object
@@ -251,6 +269,7 @@ def loop():
 	if blocking_functions_to_run:
 		# Run each blocking function
 		for func in blocking_functions_to_run:
+			logger.debug('Running Blocking Function: %s', func)
 			eval(func)
 			blocking_functions_to_run.remove(func)
 	changes = {}
@@ -264,6 +283,6 @@ def loop():
 		changes.update(scheduleControlChanges)
 	# Check to see if there have been any changes which require publishing
 	if changes:
-		print(changes)
+		#logger.debug('Changes Detected: %s', changes)
 		publish_status(changes)
 	return
