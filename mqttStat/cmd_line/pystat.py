@@ -104,7 +104,8 @@ class thermostat:
 		# Only some of the commands return data
 		if expectdata is 1:
 			while True:
-				char = self.ser.read(1).decode('ascii')
+				# decode byte by byte into ascii characters, ignore errors (periodically was crashing program, assumed due to random serial bit flips)
+				char = self.ser.read(1).decode('ascii',errors='ignore')
 				if len(char) == 0:
 					#No data was recieved back even though we were expecting some
 					break
